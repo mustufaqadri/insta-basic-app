@@ -30,18 +30,56 @@
             window.location.href = "https://www.facebook.com/v17.0/dialog/oauth?client_id=1212440606109672&redirect_uri=https://mustufaqadri.github.io/insta-basic-app/";
         }
 
-        function onPageLoad() {
+        function getLoginCode() {
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
-            
+            var fbLogInCode = "";
+
             if (urlParams.has('code')) {
-                const fbUserCode = urlParams.get('code')
-                console.log(fbUserCode);
-            } else {
-                alert("found no code")
+                fbLogInCode = urlParams.get('code');
+            }
+
+            return fbLogInCode;
+        }
+
+        function onPageLoad() {
+            const fbLogInCode = getLoginCode();
+            if (fbLogInCode) {
+                getFBUserAccessToken(fbLogInCode);
             }
         }
 
+        function getFBUserAccessToken(fbLogInCode) {
+            const redirectURL = "https://mustufaqadri.github.io/insta-basic-app/";
+            const appID = "1212440606109672";
+            const appSecret = "f85bc067f148d4461fb712565383ac29";
+
+            var OAuthURL = "https://graph.facebook.com/v17.0/oauth/access_token?";
+            OAuthURL += "client_id=" + appID;
+            OAuthURL += "&redirect_uri=" + redirectURL;
+            OAuthURL += "&client_secret=" + appSecret;
+            OAuthURL += "&code=" + fbLogInCode;
+
+            var request = $.ajax({
+                url: OAuthURL,
+                type: "GET",
+                // data: {id : menuId},
+                dataType: "json"
+            });
+
+            request.done(function(FBUserAccessToken) {
+                getFBPageAccessToken(FBUserAccessToken);
+            });
+
+            request.fail(function(jqXHR, textStatus) {
+                alert( "Request failed: " + textStatus );
+            });
+
+        }
+
+        function getFBPageAccessToken(FBUserAccessToken) {
+            console.log(FBUserAccessToken);
+        }
     </script>
 </body>
 </html>
