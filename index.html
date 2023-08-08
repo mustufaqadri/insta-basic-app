@@ -3,34 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>FB-Login</title>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 </head>
 <body onload="onPageLoad()">
     <button id="login-fb" onclick="loginFB()">Login Facebook</button>
+    <p id="page-access-token"></p>
     <script>
-        // var URL = "https://graph.facebook.com/​oauth/authorize?​client_id=1212440606109672&​redirect_uri=https://mustufaqadri.github.io/insta-basic-app/&​scope=public_profile,email";
-        // var request = $.ajax({
-        //     url: URL,
-        //     type: "GET",
-        //     // data: {id : menuId},
-        //     dataType: "json"
-        // });
+        const REDIRECT_URL = "https://mustufaqadri.github.io/insta-basic-app/";
+        const APP_ID = "1212440606109672";
+        const APP_SECRET = "f85bc067f148d4461fb712565383ac29";
+        const FB_PAGE_ID = "101518723007339";
 
-        // request.done(function(msg) {
-        //     console.log(msg);
-        //     //alert(msg);
-        // });
-
-        // request.fail(function(jqXHR, textStatus) {
-        //     alert( "Request failed: " + textStatus );
-        // });
-
-        function loginFB() {
-            window.location.href = "https://www.facebook.com/v17.0/dialog/oauth?client_id=1212440606109672&redirect_uri=https://mustufaqadri.github.io/insta-basic-app/";
+        function onPageLoad() {
+            const fbLogInCode = getFBLoginCode();
+            if (fbLogInCode) {
+                getFBUserAccessToken(fbLogInCode);
+            }
         }
 
-        function getLoginCode() {
+        function loginFB() {
+            window.location.href = "https://www.facebook.com/v17.0/dialog/oauth?client_id=" + APP_ID + "&redirect_uri=" + REDIRECT_URL;
+        }
+
+        function getFBLoginCode() {
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
             var fbLogInCode = "";
@@ -42,43 +38,50 @@
             return fbLogInCode;
         }
 
-        function onPageLoad() {
-            const fbLogInCode = getLoginCode();
-            if (fbLogInCode) {
-                getFBUserAccessToken(fbLogInCode);
-            }
-        }
-
         function getFBUserAccessToken(fbLogInCode) {
-            const redirectURL = "https://mustufaqadri.github.io/insta-basic-app/";
-            const appID = "1212440606109672";
-            const appSecret = "f85bc067f148d4461fb712565383ac29";
-
-            var OAuthURL = "https://graph.facebook.com/v17.0/oauth/access_token?";
-            OAuthURL += "client_id=" + appID;
-            OAuthURL += "&redirect_uri=" + redirectURL;
-            OAuthURL += "&client_secret=" + appSecret;
-            OAuthURL += "&code=" + fbLogInCode;
+            var oAuthURL = "https://graph.facebook.com/v17.0/oauth/access_token?";
+            oAuthURL += "client_id=" + appID;
+            oAuthURL += "&redirect_uri=" + redirectURL;
+            oAuthURL += "&client_secret=" + appSecret;
+            oAuthURL += "&code=" + fbLogInCode;
 
             var request = $.ajax({
-                url: OAuthURL,
+                url: oAuthURL,
                 type: "GET",
-                // data: {id : menuId},
                 dataType: "json"
             });
 
-            request.done(function(FBUserAccessToken) {
-                getFBPageAccessToken(FBUserAccessToken);
+            request.done(function(fbUserAccessToken) {
+                getFBPageAccessToken(fbUserAccessToken);
             });
 
             request.fail(function(jqXHR, textStatus) {
-                alert( "Request failed: " + textStatus );
+                alert("Request failed: " + textStatus);
             });
-
         }
 
-        function getFBPageAccessToken(FBUserAccessToken) {
-            console.log(FBUserAccessToken);
+        function getFBPageAccessToken(fbUserAccessToken) {
+            $("#login-fb").text("Logged In");
+            var oAuthURL = "https://graph.facebook.com/" + FBPageID + "?fields=access_token";
+            oAuthURL += "&access_token=" + fbUserAccessToken;
+
+            var request = $.ajax({
+                url: oAuthURL,
+                type: "GET",
+                dataType: "json"
+            });
+
+            request.done(function(fbPageAccessToken) {
+                displayFBPageAccessToken(fbPageAccessToken);
+            });
+
+            request.fail(function(jqXHR, textStatus) {
+                alert("Request failed: " + textStatus);
+            });
+        }
+
+        function displayFBPageAccessToken(fbPageAccessToken) {
+            $("#page-access-token").text("Page Access Token: " + fbPageAccessToken);
         }
     </script>
 </body>
