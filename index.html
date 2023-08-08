@@ -40,9 +40,9 @@
 
         function getFBUserAccessToken(fbLogInCode) {
             var oAuthURL = "https://graph.facebook.com/v17.0/oauth/access_token?";
-            oAuthURL += "client_id=" + appID;
-            oAuthURL += "&redirect_uri=" + redirectURL;
-            oAuthURL += "&client_secret=" + appSecret;
+            oAuthURL += "client_id=" + APP_ID;
+            oAuthURL += "&redirect_uri=" + REDIRECT_URL;
+            oAuthURL += "&client_secret=" + APP_SECRET;
             oAuthURL += "&code=" + fbLogInCode;
 
             var request = $.ajax({
@@ -62,7 +62,7 @@
 
         function getFBPageAccessToken(fbUserAccessToken) {
             $("#login-fb").text("Logged In");
-            var oAuthURL = "https://graph.facebook.com/" + FBPageID + "?fields=access_token";
+            var oAuthURL = "https://graph.facebook.com/" + FB_PAGE_ID + "?fields=access_token";
             oAuthURL += "&access_token=" + fbUserAccessToken;
 
             var request = $.ajax({
